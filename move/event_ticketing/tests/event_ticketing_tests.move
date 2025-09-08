@@ -11,13 +11,11 @@ module event_ticketing::event_ticketing_tests {
     fun test_full_flow() {
         let mut scenario = test_scenario::begin(ORGANIZER);
 
-        // Tx 1: Organizer initializes the counter
         {
             test_scenario::next_tx(&mut scenario, ORGANIZER);
             event_ticketing::event_counter_init(test_scenario::ctx(&mut scenario));
         };
 
-        // Tx 2: Organizer creates an event
         {
             test_scenario::next_tx(&mut scenario, ORGANIZER);
             let mut counter = test_scenario::take_owned<EventCounter>(&mut scenario);
@@ -34,7 +32,6 @@ module event_ticketing::event_ticketing_tests {
             test_scenario::return_owned(&mut scenario, counter);
         };
 
-        // Tx 3: Buyer mints a ticket
         {
             test_scenario::next_tx(&mut scenario, BUYER);
             let mut event = test_scenario::take_shared<Event>(&mut scenario);
@@ -46,15 +43,12 @@ module event_ticketing::event_ticketing_tests {
             test_scenario::return_shared(&mut scenario, event);
         };
 
-        // === Assertions ===
 
-        // Check ticket state
         let ticket = test_scenario::take_owned<Ticket>(&mut scenario);
         assert!(event_ticketing::owner(&ticket) == BUYER, 0);
         assert!(event_ticketing::seat_number(&ticket) == 1, 1);
         test_scenario::return_owned(&mut scenario, ticket);
 
-        // Check event state
         let event = test_scenario::take_shared<Event>(&mut scenario);
         assert!(event_ticketing::tickets_sold(&event) == 1, 2);
         test_scenario::return_shared(&mut scenario, event);
