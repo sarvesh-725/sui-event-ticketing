@@ -1,29 +1,64 @@
+#[test_only]
 module event_ticketing::event_ticketing_tests {
-    use event_ticketing::event_ticketing;
+    use sui::test_scenario;
     use std::string;
+    use event_ticketing::event_ticketing::{Self, Event, Ticket, EventCounter};
+
+    const ORGANIZER: address = @0xABC;
+    const BUYER: address = @0xDEF;
 
     #[test]
-    public fun test_event_creation_and_ticket_minting(ctx: &mut tx_context::TxContext) {
-        let mut counter = event_ticketing::event_counter_init(ctx);
+    fun test_full_flow() {
+        let mut scenario = test_scenario::begin(ORGANIZER);
 
-        let mut event = event_ticketing::create_event(
-            &mut counter,
-            string::utf8(b"Event 1"),
-            string::utf8(b"Sample Description"),
-            string::utf8(b"07-09-2025"),
-            string::utf8(b"Jaipur"),
-            string::utf8(b"https://cdn.prod.website-files.com/644228ffea57b5eb125a12fa/67162c1f36214ab1f0f7964a_bU8vRbUeM9UgQdkA4u2snz1hU9jbZaVcAsCroBdshfU.png"),
-            100,
-            ctx
-        );
+        // Tx 1: Organizer initializes the counter
+        {
+            test_scenario::next_tx(&mut scenario, ORGANIZER);
+            event_ticketing::event_counter_init(test_scenario::ctx(&mut scenario));
+        };
 
-        let ticket = event_ticketing::create_ticket(&mut event, 1, ctx);
+        // Tx 2: Organizer creates an event
+        {
+            test_scenario::next_tx(&mut scenario, ORGANIZER);
+            let mut counter = test_scenario::take_owned<EventCounter>(&mut scenario);
+            event_ticketing::create_event(
+                &mut counter,
+                string::utf8(b"Sui Developer Summit"),
+                string::utf8(b"A gathering of Sui builders"),
+                string::utf8(b"10-10-2025"),
+                string::utf8(b"Paris"),
+                string::utf8(b"image_url"),
+                100,
+                test_scenario::ctx(&mut scenario)
+            );
+            test_scenario::return_owned(&mut scenario, counter);
+        };
 
-        let (_name, _desc, _date, _location, _image, _max, tickets_sold, _organizer) = event_ticketing::get_event(&event);
-        assert!(tickets_sold == 1, 100);
+        // Tx 3: Buyer mints a ticket
+        {
+            test_scenario::next_tx(&mut scenario, BUYER);
+            let mut event = test_scenario::take_shared<Event>(&mut scenario);
+            event_ticketing::create_ticket(
+                &mut event,
+                1, // seat number
+                test_scenario::ctx(&mut scenario)
+            );
+            test_scenario::return_shared(&mut scenario, event);
+        };
 
-        let (owner, seat_number) = event_ticketing::get_ticket(&ticket);
-        assert!(owner == tx_context::sender(ctx), 101);
-        assert!(seat_number == 1, 102);
+        // === Assertions ===
+
+        // Check ticket state
+        let ticket = test_scenario::take_owned<Ticket>(&mut scenario);
+        assert!(event_ticketing::owner(&ticket) == BUYER, 0);
+        assert!(event_ticketing::seat_number(&ticket) == 1, 1);
+        test_scenario::return_owned(&mut scenario, ticket);
+
+        // Check event state
+        let event = test_scenario::take_shared<Event>(&mut scenario);
+        assert!(event_ticketing::tickets_sold(&event) == 1, 2);
+        test_scenario::return_shared(&mut scenario, event);
+
+        test_scenario::end(scenario);
     }
 }

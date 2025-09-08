@@ -1,10 +1,8 @@
 module event_ticketing::event_ticketing {
     use std::string;
-    use sui::transfer;
     use sui::event;
-    use sui::object;
 
-    public struct Event has key {
+    public struct Event has key, store {
         id: object::UID,
         name: string::String,
         description: string::String,
@@ -16,13 +14,13 @@ module event_ticketing::event_ticketing {
         organizer: address,
     }
 
-    public struct Ticket has key {
+    public struct Ticket has key, store {
         id: object::UID,
         owner: address,
         seat_number: u64,
     }
 
-    public struct EventCounter has key {
+    public struct EventCounter has key, store {
         id: object::UID,
         counter: u64,
     }
@@ -39,7 +37,7 @@ module event_ticketing::event_ticketing {
         organizer: address,
     }
 
-    public entry fun event_counter_init(ctx: &mut tx_context::TxContext) {
+    public fun event_counter_init(ctx: &mut tx_context::TxContext) {
         let counter = EventCounter {
             id: object::new(ctx),
             counter: 0,
@@ -48,7 +46,7 @@ module event_ticketing::event_ticketing {
         transfer::transfer(counter, tx_context::sender(ctx));
     }
 
-    public entry fun create_event(
+    public fun create_event(
         counter: &mut EventCounter,
         name: string::String,
         description: string::String,
@@ -83,10 +81,10 @@ module event_ticketing::event_ticketing {
             organizer: event.organizer,
         });
 
-        transfer::transfer(event, tx_context::sender(ctx));
+        transfer::public_share_object(event);
     }
 
-    public entry fun create_ticket(
+    public fun create_ticket(
         event: &mut Event,
         seat_number: u64,
         ctx: &mut tx_context::TxContext
@@ -102,20 +100,17 @@ module event_ticketing::event_ticketing {
         transfer::transfer(ticket, tx_context::sender(ctx));
     }
 
-    public fun get_event(event: &Event): (string::String, string::String, string::String, string::String, string::String, u64, u64, address) {
-        (
-            event.name,
-            event.description,
-            event.date,
-            event.location,
-            event.image,
-            event.max_tickets,
-            event.tickets_sold,
-            event.organizer
-        )
+    public fun tickets_sold(event: &Event): u64 {
+        event.tickets_sold
     }
 
-    public fun get_ticket(ticket: &Ticket): (address, u64) {
-        (ticket.owner, ticket.seat_number)
+    public fun owner(ticket: &Ticket): address {
+        ticket.owner
     }
+
+    public fun seat_number(ticket: &Ticket): u64 {
+        ticket.seat_number
+    }
+
+    
 }

@@ -2,7 +2,7 @@
 //run: sui client publish --gas-budget 1000000000
 //replace below the Package ID from the output
 export const PACKAGE_ID =
-  "0x463328bf694bcfc078d3317ef0116ee6a30254ba43aa4eb7ba5f14b6d01a9925";
+  "0xed9a884d90b8662b93242176da6e9f590de22b7791d231f04d6a5d42d4aedc90";
 
 export const MODULE_NAMES = {
   EVENT_TICKETING: "event_ticketing",
