@@ -33,26 +33,19 @@ sui-event-ticketing/
 │
 └─ README.md
 ```
-# ✅ Features
+### ✅ Key Features
 
-## 🎫 Organizer Tab
-- **Create new events** with details:
-  - Name
-  - Description
-  - Date
-  - Location
-  - Image
-  - Max tickets
-- **View and manage** your created events
-- **Track ticket sales** progress in real time
+#### 👩‍💼 For Event Organizers
+- Create permanent on-chain event objects
+- Full control and ownership of event data
+- Real-time ticket sales tracking from the blockchain
 
----
+#### 🧑‍🤝‍🧑 For Event Attendees
+- Browse all live events directly from the Sui blockchain
+- Secure, on-chain ticket purchases with availability checks
+- Tickets are **soulbound** and permanently tied to the buyer’s wallet
+- View owned tickets as non-transferable proof of entry
 
-## 🛒 Buyer Tab
-- Browse all available events
-- Purchase tickets for events
-- View owned tickets
-- Real-time ticket availability updates
 
 ---
 
@@ -95,25 +88,23 @@ npm run build
 # Start development server
 npm run dev
 ```
+---
 
 ## 🚀 Usage
 
 ### 🔗 Connect Wallet  
-Click the **"Connect Wallet"** button to link your Sui wallet.
+Click the **"Connect Wallet"** button to link your Sui wallet.  
 💡 Make sure you have the **Slush Wallet browser extension** installed to manage your Sui accounts.
 
----
 
-### 👩‍💼 Organizer Actions  
-In the **Organizer** tab:
-- Create and manage events  
-- Track ticket sales in real time
+### 👩‍💼 Organizer Workflow  
+1. Create a new event by filling in event details and publishing it on-chain.  
+2. Manage your event data and monitor ticket sales in real-time directly from the blockchain.  
 
----
 
-### 🧑‍🤝‍🧑 Buyer Actions  
-In the **Buyer** tab:
-- Browse available events  
-- Purchase tickets  
-- View owned tickets
+### 🧑‍🤝‍🧑 Attendee (Buyer) Workflow  
+1. Browse live events dynamically fetched from the Sui network.  
+2. Select an event and purchase a ticket by initiating a secure on-chain transaction.  
+3. The system verifies ticket availability and mints a **soulbound Ticket object**.  
+4. View your owned tickets in your Sui wallet as permanent proof of ownership (non-transferable).
 
